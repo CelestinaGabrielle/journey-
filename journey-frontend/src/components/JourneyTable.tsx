@@ -7,7 +7,7 @@ type TouchPoint = {
   utm_medium: string;
   utm_content: string;
   channel: string;
-  created_at: string;
+  createdAt: string;
 };
 
 type Journey = {
@@ -34,14 +34,19 @@ export function JourneyTable() {
             <th>Session ID</th>
             <th>Jornada</th>
             <th>Touch Points</th>
+            <th>Data Inicial</th>
           </tr>
         </thead>
+
         <tbody>
           {journeys.map((j) => (
             <tr key={j.sessionId}>
               <td>{j.sessionId}</td>
-              <td>{j.journey.map(e => e.utm_source).join(" > ")}</td>
+              <td>{j.journey.map((e) => e.utm_source).join(" > ")}</td>
               <td>{j.journey.length}</td>
+              <td>
+                {new Date(j.journey[0]?.createdAt).toLocaleDateString("pt-BR")}
+              </td>
             </tr>
           ))}
         </tbody>
