@@ -21,9 +21,31 @@ export function JourneyTable() {
   useEffect(() => {
     fetch("http://localhost:3000/journeys")
       .then((res) => res.json())
-      .then((data) => setJourneys(data))
+      .then((data) => setJourneys(formatJourneys(data)))
       .catch((err) => console.error("Erro ao buscar jornadas:", err));
   }, []);
+
+  const formatJourneys = (journeys: Journey[]): Journey[] => {
+    const journeysFormatted: Journey[] = [];
+    for (const j of journeys) {
+      const lastJourney = j.journey[j.journey.length - 1];
+      j.journey = j.journey.filter((jf, i) => {
+        const lastJourneySource = j.journey[j.journey.length - 1].utm_source;
+
+        if (lastJourneySource && jf.utm_source === lastJourneySource) {
+          if (i === j.journey.length - 1) return true; // Mantém o último
+          return false; // Remove intermediários com a mesma fonte
+        }
+
+        return j.journey.findIndex((h) => h.utm_source === jf.utm_source) === i;
+      });
+
+      if (lastJourney) j.journey.push(lastJourney);
+      journeysFormatted.push(j);
+    }
+
+    return journeysFormatted;
+  };
 
   return (
     <div className={styles.container}>
