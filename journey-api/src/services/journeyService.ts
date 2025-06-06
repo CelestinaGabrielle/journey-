@@ -1,7 +1,7 @@
-import { parseExcel } from '../utils/xlsxParser';
+import { parseExcel } from "../utils/xlsxParser";
 
 export async function processJourneys() {
-  const rawData = parseExcel('data/journeys.xlsx');
+  const rawData = parseExcel("data/journeys.xlsx");
 
   const sessions: Record<string, any[]> = {};
 
@@ -13,7 +13,10 @@ export async function processJourneys() {
   }
 
   const processed = Object.entries(sessions).map(([sessionId, events]) => {
-    events.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    events.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     const middleChannels = new Set();
     const result = [];
