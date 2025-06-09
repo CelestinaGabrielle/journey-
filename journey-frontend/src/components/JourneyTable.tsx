@@ -46,7 +46,7 @@ export function JourneyTable() {
           {journeys.map((j) => (
             <tr key={j.sessionId}>
               <td>{j.sessionId}</td>
-              <td>{j.journey.map((e) => e.utmSource).join(" > ")}</td>
+              <td>{j.journey.map((e) => e.utmSource).join(" - ")}</td>
               <td>{j.journey.length}</td>
               <td>
                 {new Date(j.journey[0]?.createdAt).toLocaleDateString("pt-BR")}
