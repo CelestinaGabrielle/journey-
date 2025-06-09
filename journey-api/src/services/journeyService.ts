@@ -1,42 +1,36 @@
+// services/journeyService.ts
 import { parseExcel } from "../utils/xlsxParser";
+import { Journey } from "../models/Journey";
+import { TouchPoint } from "../models/TouchPoint";
 
 export async function processJourneys() {
   const rawData = parseExcel("data/journeys.xlsx");
 
-  const sessions: Record<string, any[]> = {};
-
-  // Agrupar por sessionId
+  const sessions: Record<string, TouchPoint[]> = {};
+  //Agrupar os pontos de toque por sessionId
   for (const event of rawData as any[]) {
-    const { sessionId } = event;
+    const point = new TouchPoint(
+      event.utm_source,
+      event.utm_campaign,
+      event.utm_medium,
+      event.utm_content,
+      event.channel,
+      event.createdAt
+    );
+
+    const sessionId = event.sessionId;
     if (!sessions[sessionId]) sessions[sessionId] = [];
-    sessions[sessionId].push(event);
+    sessions[sessionId].push(point);
   }
 
   const processed = Object.entries(sessions).map(([sessionId, events]) => {
-    events.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-
-    const middleChannels = new Set();
-    const result = [];
-
-    for (let i = 0; i < events.length; i++) {
-      const e = events[i];
-      if (
-        i === 0 ||
-        i === events.length - 1 ||
-        !middleChannels.has(e.channel)
-      ) {
-        result.push(e);
-        if (i !== 0 && i !== events.length - 1) {
-          middleChannels.add(e.channel);
-        }
-      }
-    }
-
-    return { sessionId, journey: result };
+    const journey = new Journey(sessionId, events);
+    return {
+      sessionId,
+      journey: journey.getCleanedEvents(),
+    };
   });
 
+  // Retorna o array de jornadas processadas
   return processed;
 }
